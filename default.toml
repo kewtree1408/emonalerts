@@ -1,0 +1,42 @@
+# This is a TOML document.
+
+title = "TOML Example"
+
+[owner]
+name = "Victoria Fantasy"
+emails = [
+    "me@vika.space",
+    "vi@umc8.ru"
+]
+
+# Urls for ping
+
+[servers]
+
+    [servers.friendly_name1]
+    protocols = [
+        "http",
+        "https"
+    ]
+    hostname = "localhost"
+    ip = "192.168.1.1"
+    ports = [ 8080, 8001, 8002 ]
+    period = 5
+
+    [servers.friendly_name2]
+    protocols = ["http"]
+    hostname = "localhost"
+    ip = "192.168.1.1"
+    ports = [ 8080, 80, 81 ]
+    period = 1
+
+    [servers.friendly_name3]
+    ip = "192.168.1.1"
+    ports = [ 8001, 8001, 8002 ]
+    period = 3
+
+    [servers.friendly_name4]
+    protocols = ["https"]
+    hostname = "google.com"
+    ports = [ 80, 443 ]
+    period = 3
