@@ -10,6 +10,9 @@ from smtplib import SMTP_SSL
 from email.message import EmailMessage
 
 
+logger = logging.getLogger(__name__)
+
+
 def get_email_message(sender, recipient, problems):
     msg = EmailMessage()
     msg['Subject'] = funny_emos.get_msg_subject()
@@ -19,26 +22,24 @@ def get_email_message(sender, recipient, problems):
     return msg
 
 
-def send_from_gmail(to_emails, problems, verbose=False):
+def send_from_gmail(email_cred, to_emails, problems, verbose=False):
     """
-    Send email via gmail
+    Send email via passed credentials
     """
-    smtp_settings = {
-        'host': 'smtp.gmail.com',
-        'port': 465
-    }
-    with open('./credentials.json') as f:
+    with open(email_cred) as f:
         data = json.loads(f.read())
         smtp_settings['email'] = data['email']
         smtp_settings['password'] = data['password']
+        smtp_settings['host'] = data.get('host', 'smtp.gmail.com')
+        smtp_settings['port'] = int(data.get('port', 465))
 
     with SMTP_SSL(host=smtp_settings['host'], port=smtp_settings['port']) as smtp_server:
         smtp_server.login(data['email'], data['password'])
         if verbose:
-            logging.info("EasyMon Alerts logged in successfully!")
+            logger.info(f"EasyMon Alerts logged into {smtp_settings['host']} successfully!")
             smtp_server.set_debuglevel(1)
 
         for to_email in to_emails:
             msg = get_email_message(data['email'], to_email, problems)
-            logging.info(f'EasyMon Alerts is going to send the email with details to {to_email}...')
+            logger.info(f'EasyMon Alerts is going to send the email with details to {to_email}...')
             smtp_server.send_message(msg)

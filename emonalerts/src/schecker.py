@@ -3,20 +3,14 @@
 Schecker: server's checker
 """
 
-import argparse
 import requests
 import toml
-import ipdb
 import logging
-import requests
-import time
 import funny_emos
 from requests.compat import urljoin
 from esender import send_from_gmail
 
-
-# Change the level to logging.DEBUG to see the whole log
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
+logger = logging.getLogger(__name__)
 
 
 def get_settings(config_path):
@@ -56,9 +50,9 @@ def have_to_send_alert(file_path):
         with open(file_path, 'r') as f:
             last_line = int(f.readlines()[-1])
     except FileNotFoundError as exc:
-        logging.info(funny_emos.first_run(file_path))
+        logger.info(funny_emos.first_run(file_path))
 
-    logging.info(f'The amount of failed servers was {last_line} before.')
+    logger.info(f'The amount of failed servers was {last_line} before.')
     if last_line:
         return False
     return True
@@ -74,35 +68,12 @@ def check(args, settings):
     problems = {}
     for url, error_msg in get_failed_servers(settings['servers']):
         amount_of_errors += 1
-        logging.info(f'Something goes wrong with {url}: {error_msg}')
+        logger.info(f'Something goes wrong with {url}: {error_msg}')
         problems[url] = error_msg
 
     if args.alert and have_to_send_alert(args.file):
         owner_settings = settings['owner']
         name = owner_settings['name']
-        logging.info(f'Going to send the alert to {owner_settings["name"]}')
-        send_from_gmail(owner_settings['emails'], problems)
+        logger.info(f'Going to send the alert to {owner_settings["name"]}')
+        send_from_gmail(args.email_credentials, owner_settings['emails'], problems)
         save_to_error_file(args.file, amount_of_errors)
-
-
-def main():
-    parser = argparse.ArgumentParser(description='Set up settings for monitoring')
-    parser.add_argument('config', type=str, help='path to toml-config file')
-    parser.add_argument('-a', '--alert', action='store_true', help='ignore alerts')
-    parser.add_argument('-f', '--file', default='alerts.err', help='file with amount of errors')
-    args = parser.parse_args()
-
-    settings = get_settings(args.config)
-    logging.info(f'Get settings: {settings}')
-    while True:
-        try:
-            minutes = int(settings['period']['minutes']*60)
-            check(args, settings)
-            time.sleep(minutes)
-        except KeyboardInterrupt as exc:
-            logging.info('EsyMonAlerts was ended by user.')
-            return 0
-
-
-if __name__ == "__main__":
-    main()
