@@ -26,6 +26,7 @@ def send_from_gmail(email_cred, to_emails, problems, verbose=False):
     """
     Send email via passed credentials
     """
+    smtp_settings = {}
     with open(email_cred) as f:
         data = json.loads(f.read())
         smtp_settings['email'] = data['email']
