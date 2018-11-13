@@ -1,7 +1,9 @@
 .venv
 .history
 .vscode
+.tox
 __pycache__
 credentials.json
 alerts.err
 debug.log
+emonalerts.egg-info

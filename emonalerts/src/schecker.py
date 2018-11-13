@@ -6,9 +6,9 @@ Schecker: server's checker
 import requests
 import toml
 import logging
-import funny_emos
 from requests.compat import urljoin
-from esender import send_from_gmail
+import src.funny_emos as funny_emos
+from src.esender import send_from_gmail
 
 logger = logging.getLogger(__name__)
 

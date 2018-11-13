@@ -5,9 +5,9 @@ Esender - email sender
 
 import json
 import logging
-import funny_emos
 from smtplib import SMTP_SSL
 from email.message import EmailMessage
+import src.funny_emos as funny_emos
 
 
 logger = logging.getLogger(__name__)
