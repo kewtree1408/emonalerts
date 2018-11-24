@@ -7,7 +7,7 @@ import json
 import logging
 from smtplib import SMTP_SSL
 from email.message import EmailMessage
-import src.funny_emos as funny_emos
+import emonalerts.funny_emos as funny_emos
 
 
 logger = logging.getLogger(__name__)

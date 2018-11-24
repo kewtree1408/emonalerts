@@ -6,6 +6,9 @@
 6. Add linter
 7. Fix all linters errors
 8. Add CI/CD for linter/tests/docker update
+9. Add uptime on SQLlite: calculate successful and unsuccessful data and store in one line in MySQL
+
+
 
 docker build . -t emonalerts
-docker run -d -v $PWD/default.toml:/app/default.toml -v $PWD/credentials.json:/app/credentials.json emonalerts
+docker run -d -v $PWD/default.toml:/app/default.toml -v $PWD/credentials.json:/app/credentials.json -v $PWD/checker.db:/app/checker.db emonalerts

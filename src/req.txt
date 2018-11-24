@@ -7,3 +7,5 @@ toml==0.10.0
 ipdb==0.11
 requests==2.20.1
 emoji==0.5.1
+pytest==4.0.1
+environs==4.0.0

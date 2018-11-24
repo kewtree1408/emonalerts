@@ -8,14 +8,16 @@ import logging
 import time
 import sys
 
-from src.schecker import (
+import emonalerts.dbcmds as dbc
+
+from emonalerts.schecker import (
     check,
     get_settings,
 )
 
 def setup_logger():
     root = logging.getLogger()
-    root.setLevel(logging.WARNING)
+    root.setLevel(logging.DEBUG)
     fh = logging.FileHandler('debug.log')
     fh.setLevel(logging.DEBUG)
     ch = logging.StreamHandler(sys.stdout)
@@ -30,8 +32,15 @@ def setup_logger():
 
 
 def infinitive_check(args):
+    dbc.create_uptime_table()
+    dbc.create_alert_table()
+
     logger = setup_logger()
     settings = get_settings(args.config)
+    owner_name = settings['owner']['name']
+    if dbc.is_alert_owner_empty(owner_name):
+        dbc.insert_alert_table(owner_name, 0, False)
+
     logger.info(f'Get settings: {settings}')
     while True:
         try:
@@ -42,7 +51,7 @@ def infinitive_check(args):
             logger.info('EasyMonAlerts was ended by user.')
             return
         except Exception as exc:
-            logger.error(f'Unknown error: {exc.args}')
+            logger.exception(f'Unknown error: {exc}')
             return
 
 
@@ -52,13 +61,13 @@ def parse_args():
     parser.add_argument('email_credentials', type=str, help='path to email credentails.json')
     parser.add_argument('-a', '--alert', action='store_true', help='ignore alerts')
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose mode')
-    parser.add_argument('-f', '--file', default='alerts.err', help='file with amount of errors')
-    return parser
+    return parser.parse_args()
 
 
 def main():
+    # import ipdb; ipdb.set_trace()
     logger = setup_logger()
-    args = parser.parse_args()
+    args = parse_args()
 
     if args.verbose:
         logger = logging.getLogger()
