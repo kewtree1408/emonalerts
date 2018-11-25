@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import patch
 from pathlib import Path
 
-from emonalerts.runner import (
+from runner import (
     infinitive_check,
     parse_args,
 )
@@ -24,7 +24,7 @@ class TestRunner(unittest.TestCase):
         self.assertEqual(args.alert, True)
         self.assertEqual(args.verbose, True)
 
-    @patch('emonalerts.runner.check')
+    @patch('runner.check')
     def test_keyboard_interrupt_exception(self, mock_check):
         args = self.parser.parse_args([
             self.setting_path,
@@ -36,7 +36,7 @@ class TestRunner(unittest.TestCase):
         infinitive_check(args)
         assert mock_check.called
 
-    @patch('emonalerts.runner.check')
+    @patch('runner.check')
     def test_any_other_exception(self, mock_check):
         args = self.parser.parse_args([
             self.setting_path,

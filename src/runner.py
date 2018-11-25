@@ -61,13 +61,13 @@ def parse_args():
     parser.add_argument('email_credentials', type=str, help='path to email credentails.json')
     parser.add_argument('-a', '--alert', action='store_true', help='ignore alerts')
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose mode')
-    return parser.parse_args()
+    return parser
 
 
 def main():
-    # import ipdb; ipdb.set_trace()
     logger = setup_logger()
-    args = parse_args()
+    parser = parse_args()
+    args = parser.parse_args()
 
     if args.verbose:
         logger = logging.getLogger()
