@@ -50,7 +50,8 @@ def have_to_send_alert(owner_name):
     last_errors, need_to_send_alert = dbc.get_alert_data(owner_name)
     logger.info(f'The amount of errors was {last_errors} before.')
     logger.info(f'need_to_send_alert = {need_to_send_alert}, {bool(int(need_to_send_alert))}.')
-    return bool(int(need_to_send_alert))
+    found_errors = bool(last_errors!=0)
+    return found_errors and bool(int(need_to_send_alert))
 
 
 def check(args, settings):
@@ -65,11 +66,10 @@ def check(args, settings):
         logger.info(f'Something goes wrong with {url}: {error_msg}')
         problems[url] = error_msg
 
-    if amount_of_errors == 0:
-        dbc.update_alert_table(owner_name, amount_of_errors, True)
-
     if args.alert and have_to_send_alert(owner_name):
         name = owner_settings['name']
         logger.info(f'Going to send the alert to {owner_settings["name"]}')
         send_from_gmail(args.email_credentials, owner_settings['emails'], problems)
 
+    if amount_of_errors == 0:
+        dbc.update_alert_table(owner_name, amount_of_errors, True)
