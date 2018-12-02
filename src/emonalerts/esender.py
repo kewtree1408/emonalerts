@@ -22,12 +22,13 @@ def get_email_message(sender, recipient, problems):
     return msg
 
 
-def send_from_gmail(email_cred, to_emails, problems, verbose=False):
+def send_from_gmail(email_cred_file, to_emails, problems, verbose=False):
     """
     Send email via passed credentials
+
     """
     smtp_settings = {}
-    with open(email_cred) as f:
+    with open(email_cred_file) as f:
         data = json.loads(f.read())
         smtp_settings['email'] = data['email']
         smtp_settings['password'] = data['password']
