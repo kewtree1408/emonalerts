@@ -9,7 +9,7 @@ import logging
 from requests.compat import urljoin
 import emonalerts.dbcmds as dbc
 import emonalerts.funny_emos as funny_emos
-from emonalerts.esender import send_from_gmail
+from emonalerts.esender import send_via_smtp
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +54,17 @@ def have_to_send_alert(owner_name):
     return found_errors and bool(int(need_to_send_alert))
 
 
+def get_smtp_settings(email_cred_file):
+    smtp_settings = {}
+    with open(email_cred_file) as f:
+        data = json.loads(f.read())
+        smtp_settings['email'] = data['email']
+        smtp_settings['password'] = data['password']
+        smtp_settings['host'] = data.get('host', 'smtp.gmail.com')
+        smtp_settings['port'] = int(data.get('port', 465))
+    return smtp_settings
+
+
 def check(args, settings):
     owner_settings = settings['owner']
     owner_name = owner_settings['name']
@@ -69,7 +80,8 @@ def check(args, settings):
     if args.alert and have_to_send_alert(owner_name):
         name = owner_settings['name']
         logger.info(f'Going to send the alert to {owner_settings["name"]}')
-        send_from_gmail(args.email_credentials, owner_settings['emails'], problems)
+        smtp_settings = get_smtp_settings(args.email_credentials)
+        send_via_smtp(smtp_settings, owner_settings['emails'], problems)
 
     if amount_of_errors == 0:
         dbc.update_alert_table(owner_name, amount_of_errors, True)
