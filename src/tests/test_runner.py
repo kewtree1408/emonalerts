@@ -14,8 +14,8 @@ class TestRunner(unittest.TestCase):
     def setUp(self):
         self.parser = parse_args()
         self.cur_dir = Path.cwd()
-        self.setting_path = str(self.cur_dir.joinpath('src/tests/inputs/settings.toml'))
-        self.credential_path = str(self.cur_dir.joinpath('src/tests/inputs/creds.json'))
+        self.setting_path = str(self.cur_dir.joinpath('src/tests/input/settings.toml'))
+        self.credential_path = str(self.cur_dir.joinpath('src/tests/input/creds.json'))
 
     def test_parsing_args(self):
         args = self.parser.parse_args(['test', 'test2', '-a', '-v'])

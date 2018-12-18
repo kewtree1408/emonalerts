@@ -4,7 +4,7 @@ import unittest
 
 class TestConfig(unittest.TestCase):
     def test_empty_config(self):
-        pass
+
 
     def test_simple_config(self):
         pass
@@ -63,9 +63,17 @@ class TestHaveToSendAlert(unittest.TestCase):
 
 class TestCheck(unittest.TestCase):
 
+    def setUp(self):
+        self.parser = parse_args()
+        self.cur_dir = Path.cwd()
+
     def test_check_successful(self):
-        pass
+        self.setting_path = str(self.cur_dir.joinpath('src/tests/input/success_settings.toml'))
+        self.credential_path = str(self.cur_dir.joinpath('src/tests/input/success_creds.json'))
+
 
     def test_check_without_owner(self):
-        pass
+        self.setting_path = str(self.cur_dir.joinpath('src/tests/input/failed_settings.toml'))
+        self.credential_path = str(self.cur_dir.joinpath('src/tests/input/failed_creds.json'))
+
 
