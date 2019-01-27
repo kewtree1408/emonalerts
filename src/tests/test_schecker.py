@@ -7,10 +7,14 @@ from unittest.mock import (
 )
 
 from emonalerts.schecker import get_failed_servers
+import responses
+from requests.exceptions import (
+    ConnectionError,
+    ConnectTimeout,
+)
 
 
 class TestGetFailedServers(unittest.TestCase):
-    # @patch('emonalert.schecker.requests.get', return_value=500)
     def test_get_failed_servers(self):
         servers = {
             'The Rosalind server': {
@@ -23,7 +27,7 @@ class TestGetFailedServers(unittest.TestCase):
             }
         }
 
-        status_code = 500
+        status_code = 404
         mock = Mock()
         mock.status_code = status_code
         with patch(
@@ -41,25 +45,115 @@ class TestGetFailedServers(unittest.TestCase):
         self.assertEqual(sorted(results), sorted(expected_data))
 
     def test_get_failed_servers_without_name(self):
-        pass
+        servers = {
+            'The Rosalind server': {
+                'schemes': ['http', 'https']
+            },
+            'My Digital Ocean': {
+                'ports': [80, 443]
+            }
+        }
+        results = list(get_failed_servers(servers))
 
-    def test_get_failed_servers_with_400(self):
-        pass
+        expected_data = []
+        self.assertEqual(results, expected_data)
 
-    def test_get_failed_servers_with_500(self):
-        pass
-
+    @responses.activate
     def test_get_failed_servers_with_timeout(self):
-        pass
+        servers = {
+            'The Rosalind server': {
+                'host': 'rosalind.info',
+                'schemes': ['http', 'https']
+            },
+            'My Digital Ocean': {
+                'host': 'vika.space',
+                'ports': [80, 443]
+            }
+        }
 
+        responses.add(responses.GET, 'https://rosalind.info', body=ConnectionError('Not reachable'))
+        responses.add(responses.GET, 'http://rosalind.info', status=200)
+        responses.add(responses.GET, 'http://vika.space', status=301)
+        responses.add(responses.GET, 'https://vika.space', status=302)
+        results = list(get_failed_servers(servers))
+
+        expected_data = [
+            ('https://rosalind.info', 'Not reachable'),
+        ]
+        self.assertEqual(results, expected_data)
+
+    @responses.activate
     def test_get_failed_servers_with_connection_error(self):
-        pass
+        servers = {
+            'The Rosalind server': {
+                'host': 'rosalind.info',
+                'schemes': ['http', 'https']
+            },
+            'My Digital Ocean': {
+                'host': 'vika.space',
+                'ports': [80, 443]
+            }
+        }
 
+        responses.add(responses.GET, 'https://rosalind.info', body=ConnectionError('Not reachable'))
+        responses.add(responses.GET, 'http://rosalind.info', status=200)
+        responses.add(responses.GET, 'http://vika.space', body=ConnectTimeout('Timeout'))
+        responses.add(responses.GET, 'https://vika.space', status=302)
+        results = list(get_failed_servers(servers))
+
+        expected_data = [
+            ('https://rosalind.info', 'Not reachable'), ('http://vika.space', 'Timeout')
+        ]
+        self.assertEqual(sorted(results), sorted(expected_data))
+
+    @responses.activate
     def test_get_failed_servers_with_some_expection(self):
-        pass
+        servers = {
+            'The Rosalind server': {
+                'host': 'rosalind.info',
+                'schemes': ['http', 'https']
+            },
+            'My Digital Ocean': {
+                'host': 'vika.space',
+                'ports': [80, 443]
+            }
+        }
 
+        responses.add(
+            responses.GET, 'https://rosalind.info', body=ValueError('Value error exception')
+        )
+        responses.add(responses.GET, 'http://rosalind.info', status=200)
+        responses.add(responses.GET, 'http://vika.space', body=Exception('UnkownException'))
+        responses.add(responses.GET, 'https://vika.space', status=302)
+        results = list(get_failed_servers(servers))
+
+        expected_data = [
+            ('https://rosalind.info', 'Value error exception'),
+            ('http://vika.space', 'UnkownException')
+        ]
+        self.assertEqual(sorted(results), sorted(expected_data))
+
+    @responses.activate
     def test_get_failed_servers_without_failures(self):
-        pass
+        servers = {
+            'The Rosalind server': {
+                'host': 'rosalind.info',
+                'schemes': ['http', 'https']
+            },
+            'My Digital Ocean': {
+                'host': 'vika.space',
+                'ports': [80, 443]
+            }
+        }
+
+        responses.add(responses.GET, 'https://rosalind.info', status=200)
+        responses.add(responses.GET, 'http://rosalind.info', status=200)
+        responses.add(responses.GET, 'http://vika.space', status=301)
+        responses.add(responses.GET, 'https://vika.space', status=302)
+        results = list(get_failed_servers(servers))
+
+        expected_data = []
+        self.assertEqual(results, expected_data)
 
 
 class TestHaveToSendAlert(unittest.TestCase):

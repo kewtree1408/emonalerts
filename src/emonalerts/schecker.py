@@ -33,9 +33,11 @@ def get_failed_servers(servers):
                 response = requests.get(url, timeout=5)
                 if response.status_code >= 400:
                     yield (url, response.status_code)
-            except requests.exceptions.ConnectionError as ex:
+            except requests.exceptions.RequestException as exc:
                 # dbc.increase_uptime_table(url, percentage)
-                yield (url, ex)
+                yield (url, exc.args[0])
+            except Exception as exc:
+                yield (url, exc.args[0])
 
 
 def have_to_send_alert(owner_name):
