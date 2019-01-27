@@ -30,9 +30,7 @@ class EasyORM(object):
         Create table. If it's already exist, then skip it.
         :params: kwargs is a dict with key as a column and value as a column type
         """
-        create_query = self._array_to_query([
-            f'{column}, {kwargs[column]}' for column in kwargs
-        ])
+        create_query = self._array_to_query([f'{column}, {kwargs[column]}' for column in kwargs])
 
         cur = self.conn.cursor()
         try:
@@ -47,9 +45,7 @@ class EasyORM(object):
         :params: kwargs is a dict with key as a column and value for the column
         """
         column_query = self._array_to_query(list(kwargs.keys()))
-        values_query = self._array_to_query([
-            f'"{kwargs[column]}"' for column in kwargs
-        ])
+        values_query = self._array_to_query([f'"{kwargs[column]}"' for column in kwargs])
 
         cur = self.conn.cursor()
         cur.execute(f'INSERT INTO "{self.table_name}" ({column_query}) VALUES ({values_query})')

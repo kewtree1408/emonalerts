@@ -8,7 +8,7 @@ import logging
 import time
 import sys
 
-import emonalerts.dbcmds as dbc
+import emonalerts.db.cmds as dbc
 
 from emonalerts.schecker import (
     check,
@@ -32,8 +32,6 @@ def setup_logger():
 
 
 def infinitive_check(args):
-    dbc.create_uptime_table()
-    dbc.create_alert_table()
 
     logger = setup_logger()
     settings = get_settings(args.config)

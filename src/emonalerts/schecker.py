@@ -8,7 +8,7 @@ import toml
 import json
 import logging
 from requests.compat import urljoin
-import emonalerts.dbcmds as dbc
+import emonalerts.db.cmds as dbc
 import emonalerts.funny_emos as funny_emos
 from emonalerts.esender import send_via_smtp
 from emonalerts.utils import get_urls

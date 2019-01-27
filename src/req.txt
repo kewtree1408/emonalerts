@@ -10,3 +10,4 @@ emoji==0.5.1
 pytest==4.0.1
 environs==4.0.0
 responses==0.10.5
+pony==0.7.9
