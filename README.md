@@ -1,4 +1,4 @@
-EDocMon is easy monitoring for your docker containers.
+EMonAlerts is easy monitoring for your servers.
 
 [test badge]
 [version python badge]
@@ -20,5 +20,18 @@ How to run
 docker run ...
 
 How to use:
-...
+```
+source edocmon/.venv/bin/activate
+./src/runner.py success.toml credentials.json -v -a
+```
 
+How to run tests:
+```
+cd edocmon/
+tox
+```
+
+How to run one test:
+```
+tox -- src/tests/test_utils.py::TestHostSettings::test_host_settings
+```

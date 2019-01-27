@@ -5,11 +5,13 @@ Schecker: server's checker
 
 import requests
 import toml
+import json
 import logging
 from requests.compat import urljoin
 import emonalerts.dbcmds as dbc
 import emonalerts.funny_emos as funny_emos
 from emonalerts.esender import send_via_smtp
+from emonalerts.utils import get_urls
 
 logger = logging.getLogger(__name__)
 
@@ -20,23 +22,13 @@ def get_settings(config_path):
     return data
 
 
-def create_url(proto, hostname, port):
-    return f'{proto}://{hostname}:{port}'
-
-
-def gen_urls(host_settings):
-    for proto in host_settings.get('protocols', []):
-        for port in host_settings.get('ports', []):
-            yield create_url(proto, host_settings.get('hostname'), port)
-
-
 def get_failed_servers(servers):
     for friendly_name in servers:
-        hostname = servers[friendly_name].get('hostname')
+        hostname = servers[friendly_name].get('host')
         if not hostname:
             continue
 
-        for url in gen_urls(servers[friendly_name]):
+        for url in get_urls(servers[friendly_name]):
             try:
                 response = requests.get(url, timeout=5)
                 if response.status_code >= 400:
@@ -50,7 +42,7 @@ def have_to_send_alert(owner_name):
     last_errors, need_to_send_alert = dbc.get_alert_data(owner_name)
     logger.info(f'The amount of errors was {last_errors} before.')
     logger.info(f'need_to_send_alert = {need_to_send_alert}, {bool(int(need_to_send_alert))}.')
-    found_errors = bool(last_errors!=0)
+    found_errors = bool(last_errors != 0)
     return found_errors and bool(int(need_to_send_alert))
 
 

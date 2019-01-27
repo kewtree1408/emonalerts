@@ -11,4 +11,4 @@
 
 
 docker build . -t emonalerts
-docker run -d -v $PWD/default.toml:/app/default.toml -v $PWD/credentials.json:/app/credentials.json -v $PWD/checker.db:/app/checker.db emonalerts
+docker run -d -v $PWD/success.toml:/app/success.toml -v $PWD/credentials.json:/app/credentials.json -v $PWD/checker.db:/app/checker.db emonalerts

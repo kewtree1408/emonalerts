@@ -18,30 +18,24 @@ minutes = 5
 [servers]
 
     [servers.friendly_name1]
-    protocols = [
+    schemes = [
         "http",
         "https"
     ]
-    hostname = "localhost"
-    ip = "192.168.1.1"
+    host = "localhost"
     ports = [ 8080, 8001, 8002 ]
 
     [servers.friendly_name2]
-    protocols = ["http"]
-    hostname = "localhost"
-    ip = "192.168.1.1"
+    schemes = ["http"]
+    host = "localhost"
     ports = [ 8080, 80, 81 ]
 
-    [servers.friendly_name3]
-    ip = "192.168.1.1"
-    ports = [ 8001, 8001, 8002 ]
-
     [servers.friendly_name4]
-    protocols = ["https"]
-    hostname = "google.com"
+    schemes = ["https"]
+    host = "google.com"
     ports = [ 80, 443 ]
 
     [servers.friendly_name5]
-    protocols = ["https"]
-    hostname = "vika.space"
+    schemes = ["https"]
+    host = "vika.space"
     ports = [ 80, 443 ]

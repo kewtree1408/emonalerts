@@ -12,17 +12,16 @@ emails = [
 [period]
 minutes = 5
 
-
 # Urls for ping
 
 [servers]
 
     [servers.friendly_name4]
-    protocols = ["https"]
-    hostname = "google.com"
+    host = "google.com"
+    schemes = ["https"]
     ports = [ 443 ]
 
     [servers.friendly_name5]
-    protocols = ["https"]
-    hostname = "vika.space"
+    host = "vika.space"
+    schemes = ["https"]
     ports = [ 443 ]
