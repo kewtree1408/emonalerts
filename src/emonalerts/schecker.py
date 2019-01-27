@@ -34,6 +34,7 @@ def get_failed_servers(servers):
                 if response.status_code >= 400:
                     yield (url, response.status_code)
             except requests.exceptions.RequestException as exc:
+                import ipdb; ipdb.set_trace()
                 # dbc.increase_uptime_table(url, percentage)
                 yield (url, exc.args[0])
             except Exception as exc:

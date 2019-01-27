@@ -2,7 +2,7 @@
 2. Add docker file +
 3. Add docker volume for toml, logs and amount of errors +
 4. Add easy docker installation +
-5. Add tests
+5. Add tests +
 6. Add linter
 7. Fix all linters errors
 8. Add CI/CD for linter/tests/docker update
@@ -12,3 +12,6 @@
 
 docker build . -t emonalerts
 docker run -d -v $PWD/success.toml:/app/success.toml -v $PWD/credentials.json:/app/credentials.json -v $PWD/checker.db:/app/checker.db emonalerts
+
+
+10. Chnage schemes to schemAAAA

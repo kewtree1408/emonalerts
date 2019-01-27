@@ -17,7 +17,7 @@ minutes = 5
 
 [servers]
 
-    [servers.friendly_name1]
+    [servers.localhost]
     schemes = [
         "http",
         "https"
