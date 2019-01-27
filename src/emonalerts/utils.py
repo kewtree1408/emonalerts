@@ -55,16 +55,14 @@ def get_urls(host_settings):
                 result_urls.append(f'http://{host}:{port}')
         return result_urls
 
-    result_urls = []
+    result_urls = set()
     for scheme in schemes:
-        if scheme != 'http':
-            result_urls.append(f'{scheme}://{host}')
-            continue
+        result_urls.add(f'{scheme}://{host}')
         for port in ports:
             if port == 80:
-                result_urls.append(f'http://{host}')
+                result_urls.add(f'http://{host}')
             if port == 443:
-                result_urls.append(f'https://{host}')
+                result_urls.add(f'https://{host}')
             else:
-                result_urls.append(f'http://{host}:{port}')
-    return result_urls
+                result_urls.add(f'http://{host}:{port}')
+    return list(result_urls)

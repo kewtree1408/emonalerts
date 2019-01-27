@@ -5,13 +5,24 @@ from unittest.mock import (
     patch,
     Mock,
 )
+from emonalerts.db.models import (
+    Alert,
+    Uptime,
+)
+from pony.orm.core import *
 
-from emonalerts.schecker import get_failed_servers
 import responses
 from requests.exceptions import (
     ConnectionError,
     ConnectTimeout,
 )
+
+from emonalerts.schecker import (
+    get_failed_servers,
+    have_to_send_alert,
+    check,
+)
+import emonalerts.db.cmds as dbc
 
 
 class TestGetFailedServers(unittest.TestCase):
@@ -157,25 +168,141 @@ class TestGetFailedServers(unittest.TestCase):
 
 
 class TestHaveToSendAlert(unittest.TestCase):
-    def test_have_to_send_alert_file_with_zero(self):
-        pass
+    def test_with_data_in_db(self):
+        last_errors, need_to_send_alert = 5, True
+        current_errors = 0
+        with patch(
+                'emonalerts.schecker.dbc.get_alert_data',
+                return_value=(last_errors, need_to_send_alert),
+        ) as mock_method:
+            result = have_to_send_alert('me', 0)
+        self.assertEqual(result, True)
 
-    def test_have_to_send_alert_file_with_not_zero(self):
-        pass
+    def test_with_last_errors(self):
+        last_errors, need_to_send_alert = 5, False
+        current_errors = 5
+        with patch(
+                'emonalerts.schecker.dbc.get_alert_data',
+                return_value=(last_errors, need_to_send_alert),
+        ) as mock_method:
+            result = have_to_send_alert('me', current_errors)
+        self.assertEqual(result, False)
 
-    def test_have_to_send_alert_file_not_found(self):
-        pass
+    def test_without_data_in_db(self):
+        last_errors, need_to_send_alert = None, None
+        current_errors = 0
+        with patch(
+                'emonalerts.schecker.dbc.get_alert_data',
+                return_value=(last_errors, need_to_send_alert),
+        ) as mock_method:
+            result = have_to_send_alert('me', current_errors)
+        self.assertEqual(result, True)
 
 
-# class TestCheck(unittest.TestCase):
-#     def setUp(self):
-#         self.parser = parse_args()
-#         self.cur_dir = Path.cwd()
+class TestCheck(unittest.TestCase):
+    @db_session
+    def setUp(self):
+        Alert.select().delete(bulk=True)
 
-#     def test_check_successful(self):
-#         self.setting_path = str(self.cur_dir.joinpath('src/tests/input/success_settings.toml'))
-#         self.credential_path = str(self.cur_dir.joinpath('src/tests/input/success_creds.json'))
+    @responses.activate
+    def test_check_successful(self):
+        owner_name = 'Victoria'
+        settings = {
+            'owner': {
+                'name': owner_name,
+                'emails': [
+                    'vi@umc8.ru',
+                    'me@vika.space',
+                ]
+            },
+            'servers': {
+                'server1': {
+                    'host': 'google.com',
+                    'schemes': ['http', 'https'],
+                    'ports': [8080, 9090],
+                },
+                'server2': {
+                    'host': 'yandex.com',
+                    'schemes': ['https'],
+                },
+            }
+        }
+        mock_args = Mock()
+        mock_args.alert = True
 
-#     def test_check_without_owner(self):
-#         self.setting_path = str(self.cur_dir.joinpath('src/tests/input/failed_settings.toml'))
-#         self.credential_path = str(self.cur_dir.joinpath('src/tests/input/failed_creds.json'))
+        responses.add(responses.GET, 'https://google.com', status=200)
+        responses.add(responses.GET, 'http://google.com', status=202)
+        responses.add(responses.GET, 'http://google.com:8080', status=302)
+        responses.add(responses.GET, 'http://google.com:9090', status=301)
+        responses.add(responses.GET, 'https://yandex.com', status=200)
+
+        email_credentials = {
+            'email': 'mon.alerts@gmail.com',
+            'password': 'testme',
+            'host': 'smtp.gmail.com',
+            'port': 465,
+        }
+        with patch('emonalerts.schecker.send_via_smtp', return_value=None) as p2, \
+             patch('emonalerts.schecker.get_smtp_settings', return_value=email_credentials) as p1:
+            check(mock_args, settings)
+
+        amount_of_errors, will_send_emails = dbc.get_alert_data(owner_name)
+        self.assertEqual(amount_of_errors, 0)
+        # True -> because it's first run
+        self.assertEqual(will_send_emails, True)
+
+    @responses.activate
+    def test_check_unsuccessful(self):
+        owner_name = 'Victoria'
+        settings = {
+            'owner': {
+                'name': owner_name,
+                'emails': [
+                    'vi@umc8.ru',
+                    'me@vika.space',
+                ]
+            },
+            'servers': {
+                'server1': {
+                    'host': 'google.com',
+                    'schemes': ['http', 'https'],
+                    'ports': [8080, 9090],
+                },
+                'server2': {
+                    'host': 'yandex.com',
+                    'schemes': ['https'],
+                },
+            }
+        }
+        mock_args = Mock()
+        mock_args.alert = True
+
+        responses.add(responses.GET, 'https://google.com', status=404)
+        responses.add(responses.GET, 'http://google.com', status=500)
+        responses.add(responses.GET, 'http://google.com:8080', status=400)
+        responses.add(responses.GET, 'http://google.com:9090', status=301)
+        responses.add(responses.GET, 'https://yandex.com', status=200)
+
+        email_credentials = {
+            'email': 'mon.alerts@gmail.com',
+            'password': 'testme',
+            'host': 'smtp.gmail.com',
+            'port': 465,
+        }
+        with patch('emonalerts.schecker.send_via_smtp', return_value=None) as p2, \
+             patch('emonalerts.schecker.get_smtp_settings', return_value=email_credentials) as p1:
+            check(mock_args, settings)
+
+        amount_of_errors, will_send_emails = dbc.get_alert_data(owner_name)
+        self.assertEqual(amount_of_errors, 3)
+        # True -> because it's first run
+        self.assertEqual(will_send_emails, True)
+
+        with patch('emonalerts.schecker.send_via_smtp', return_value=None) as p2, \
+             patch('emonalerts.schecker.get_smtp_settings', return_value=email_credentials) as p1:
+            check(mock_args, settings)
+
+        amount_of_errors, will_send_emails = dbc.get_alert_data(owner_name)
+        self.assertEqual(amount_of_errors, 3)
+        # True -> because it's first run
+        self.assertEqual(will_send_emails, False)

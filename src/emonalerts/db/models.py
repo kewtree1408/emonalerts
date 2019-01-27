@@ -9,6 +9,7 @@ from pony.orm.core import *
 db = Database("sqlite", settings.DB_NAME, create_db=True)
 
 
+# Uptime table - not using right not
 class Uptime(db.Entity):
     url = Required(unicode, unique=True)
     successful = Required(int)
@@ -19,6 +20,7 @@ class Uptime(db.Entity):
 class Alert(db.Entity):
     owner_name = Required(unicode, unique=True)
     error_amount = Required(int)
+    # alert_needed - not using right now
     alert_needed = Required(bool)
 
 

@@ -40,12 +40,17 @@ def get_failed_servers(servers):
                 yield (url, exc.args[0])
 
 
-def have_to_send_alert(owner_name):
-    last_errors, need_to_send_alert = dbc.get_alert_data(owner_name)
+def have_to_send_alert(owner_name, current_errors):
+    """
+    Alerts will be sent:
+    1. If we run it very first time
+    (DB is empty for this user and configuration)
+    2. If the previous amount of errors not the same as before
+    """
+    last_errors, _ = dbc.get_alert_data(owner_name)
     logger.info(f'The amount of errors was {last_errors} before.')
-    logger.info(f'need_to_send_alert = {need_to_send_alert}, {bool(int(need_to_send_alert))}.')
-    found_errors = bool(last_errors != 0)
-    return found_errors and bool(int(need_to_send_alert))
+    errors_diff = bool(last_errors != current_errors)
+    return errors_diff
 
 
 def get_smtp_settings(email_cred_file):
@@ -66,16 +71,16 @@ def check(args, settings):
     problems = {}
     for url, error_msg in get_failed_servers(settings['servers']):
         amount_of_errors += 1
-        if have_to_send_alert(owner_name):
-            dbc.update_alert_table(owner_name, amount_of_errors, False)
         logger.info(f'Something goes wrong with {url}: {error_msg}')
         problems[url] = error_msg
 
-    if args.alert and have_to_send_alert(owner_name):
+    should_send = have_to_send_alert(owner_name, amount_of_errors)
+    if args.alert and should_send:
         name = owner_settings['name']
         logger.info(f'Going to send the alert to {owner_settings["name"]}')
         smtp_settings = get_smtp_settings(args.email_credentials)
         send_via_smtp(smtp_settings, owner_settings['emails'], problems)
 
-    if amount_of_errors == 0:
-        dbc.update_alert_table(owner_name, amount_of_errors, True)
+    print('Amount: ')
+    print(amount_of_errors)
+    dbc.update_alert_table(owner_name, amount_of_errors, should_send)

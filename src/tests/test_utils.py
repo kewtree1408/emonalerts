@@ -12,8 +12,11 @@ class TestHostSettings(unittest.TestCase):
             'ports': [443, 8080, 1234]
         }
         expected_urls = [
-            'http://google.com:1234', 'http://google.com:8080', 'https://google.com',
-            'https://google.com', 'udp://google.com'
+            'http://google.com:1234',
+            'http://google.com:8080',
+            'https://google.com',
+            'udp://google.com',
+            'http://google.com',
         ]
         result_urls = sorted(get_urls(host_settings))
         self.assertEqual(result_urls, sorted(expected_urls))
@@ -56,8 +59,26 @@ class TestHostSettings(unittest.TestCase):
             'ips': ['198.120.0.1', '0.0.0.0']
         }
         expected_urls = [
-            'http://apple.com:1234', 'http://apple.com:8080', 'https://apple.com',
-            'https://apple.com', 'udp://apple.com'
+            'http://apple.com:1234',
+            'http://apple.com:8080',
+            'https://apple.com',
+            'udp://apple.com',
+            'http://apple.com',
+        ]
+        result_urls = sorted(get_urls(host_settings))
+        self.assertEqual(result_urls, sorted(expected_urls))
+
+    def test_http(self):
+        host_settings = {
+            'host': 'google.com',
+            'schemes': ['http', 'https'],
+            'ports': [8080, 9090],
+        }
+        expected_urls = [
+            'http://google.com:8080',
+            'http://google.com:9090',
+            'http://google.com',
+            'https://google.com',
         ]
         result_urls = sorted(get_urls(host_settings))
         self.assertEqual(result_urls, sorted(expected_urls))
