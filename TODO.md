@@ -14,4 +14,4 @@ docker build . -t emonalerts
 docker run -d -v $PWD/success.toml:/app/success.toml -v $PWD/credentials.json:/app/credentials.json -v $PWD/checker.db:/app/checker.db emonalerts
 
 
-10. Chnage schemes to schemAAAA
+10. Change schemes to schemAAAA
