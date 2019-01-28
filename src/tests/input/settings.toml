@@ -1,0 +1,41 @@
+# This is a TOML document.
+
+title = "TOML Example for EasyMonAlerts"
+
+[owner]
+name = "Victoria Fantasy"
+emails = [
+    "me@vika.space",
+    "vi@umc8.ru"
+]
+
+[period]
+minutes = 5
+
+
+# Urls for ping
+
+[servers]
+
+    [servers.localhost]
+    schemes = [
+        "http",
+        "https"
+    ]
+    host = "localhost"
+    ports = [ 8080, 8001, 8002 ]
+
+    [servers.friendly_name2]
+    schemes = ["http"]
+    host = "localhost"
+    ports = [ 8080, 80, 81 ]
+
+    [servers.friendly_name4]
+    schemes = ["https"]
+    host = "google.com"
+    ports = [ 80, 443 ]
+
+    [servers.friendly_name5]
+    schemes = ["https"]
+    host = "vika.space"
+    ports = [ 80, 443 ]

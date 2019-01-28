@@ -1,5 +1,7 @@
 # EMonAlerts is easy monitoring for your servers.
 
+[![Build Status](https://travis-ci.com/kewtree1408/emonalerts.svg?token=sN2juxZGRBsY3B6bKghG&branch=master)](https://travis-ci.com/kewtree1408/emonalerts)
+
 ## Run via docker:
 ```
 docker build . -t emonalerts
