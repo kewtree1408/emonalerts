@@ -1,4 +1,4 @@
-#EMonAlerts is easy monitoring for your servers.
+# EMonAlerts is easy monitoring for your servers.
 
 ## Run via docker:
 ```
