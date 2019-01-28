@@ -6,7 +6,6 @@ title = "TOML Example for EasyMonAlerts"
 name = "Victoria Fantasy"
 emails = [
     "me@vika.space",
-    "vi@umc8.ru"
 ]
 
 [period]
@@ -18,10 +17,8 @@ minutes = 5
 
     [servers.Google]
     host = "google.com"
-    schemes = ["https"]
     ports = [ 443 ]
 
-    [servers.VikaSpace]
-    host = "vika.space"
+    [servers.Yandex]
+    host = "yandex.ru"
     schemes = ["https"]
-    ports = [ 443 ]

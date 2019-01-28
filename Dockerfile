@@ -1,4 +1,4 @@
-FROM python:3.6
+FROM python:3.7.2-alpine3.8
 
 LABEL name="Victoria"
 LABEL email="me@vika.space"
