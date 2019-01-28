@@ -9,8 +9,8 @@ from runner import (
     parse_args,
 )
 
-class TestRunner(unittest.TestCase):
 
+class TestRunner(unittest.TestCase):
     def setUp(self):
         self.parser = parse_args()
         self.cur_dir = Path.cwd()
@@ -26,24 +26,14 @@ class TestRunner(unittest.TestCase):
 
     @patch('runner.check')
     def test_keyboard_interrupt_exception(self, mock_check):
-        args = self.parser.parse_args([
-            self.setting_path,
-            self.credential_path,
-            '-a',
-            '-v'
-        ])
+        args = self.parser.parse_args([self.setting_path, self.credential_path, '-a', '-v'])
         mock_check.side_effect = KeyboardInterrupt('Stop!')
         infinitive_check(args)
         assert mock_check.called
 
     @patch('runner.check')
     def test_any_other_exception(self, mock_check):
-        args = self.parser.parse_args([
-            self.setting_path,
-            self.credential_path,
-            '-a',
-            '-v'
-        ])
+        args = self.parser.parse_args([self.setting_path, self.credential_path, '-a', '-v'])
         mock_check.side_effect = Exception('Boom!')
         infinitive_check(args)
         assert mock_check.called
