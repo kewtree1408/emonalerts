@@ -12,3 +12,8 @@
 - [test badge]
 - [version python badge]
 - [docker hub]
+12. Do not store password in credentials
+13. Change the mails with html, simplify the report
+14. Send the table with statuses:
+this server - perfect
+that server - something bad happend
