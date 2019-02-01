@@ -43,7 +43,7 @@ def infinitive_check(args):
     while True:
         try:
             minutes = int(settings['period']['minutes']*60)
-            check(args, settings)
+            check(args)
             time.sleep(minutes)
         except KeyboardInterrupt as exc:
             logger.info('EasyMonAlerts was ended by user.')
@@ -56,7 +56,14 @@ def infinitive_check(args):
 def parse_args():
     parser = argparse.ArgumentParser(description='Set up settings for alerts and monitoring')
     parser.add_argument('config', type=str, help='path to toml-config file')
-    parser.add_argument('email_credentials', type=str, help='path to email credentails.json')
+    parser.add_argument(
+        '-e',
+        '--email',
+        required=False,
+        dest='email_credentials',
+        type=str,
+        help='path to email credentails.json'
+    )
     parser.add_argument('-a', '--alert', action='store_true', help='ignore alerts')
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose mode')
     return parser

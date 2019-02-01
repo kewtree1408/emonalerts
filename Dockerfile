@@ -6,5 +6,10 @@ LABEL email="me@vika.space"
 COPY ./src/ /app
 WORKDIR /app
 RUN pip install -r req.txt && chmod +x runner.py
+ARG TOML
+ARG EMAIL
 
-ENTRYPOINT [ "./runner.py", "success.toml", "credentials.json", "-a", "-v"]
+RUN echo ${TOML}
+RUN echo ${EMAIL}
+
+ENTRYPOINT ["./runner.py", ${TOML}, ${EMAIL}, "-a", "-v"]

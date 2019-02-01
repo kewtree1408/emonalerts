@@ -10,7 +10,10 @@ import logging
 from requests.compat import urljoin
 import emonalerts.db.cmds as dbc
 import emonalerts.funny_emos as funny_emos
-from emonalerts.esender import send_via_smtp
+from emonalerts.esender import (
+    send_via_smtp,
+    send_via_terminal,
+)
 from emonalerts.utils import get_urls
 
 logger = logging.getLogger(__name__)
@@ -64,7 +67,16 @@ def get_smtp_settings(email_cred_file):
     return smtp_settings
 
 
-def check(args, settings):
+def send_alert(args, owner_emails, problems):
+    if args.email_credentials:
+        smtp_settings = get_smtp_settings(args.email_credentials)
+        send_via_smtp(smtp_settings, owner_emails, problems)
+    else:
+        send_via_terminal(owner_emails, problems)
+
+
+def check(args):
+    settings = get_settings(args.config)
     owner_settings = settings['owner']
     owner_name = owner_settings['name']
     amount_of_errors = 0
@@ -76,10 +88,8 @@ def check(args, settings):
 
     should_send = have_to_send_alert(owner_name, amount_of_errors)
     if args.alert and should_send:
-        name = owner_settings['name']
-        logger.info(f'Going to send the alert to {owner_settings["name"]}')
-        smtp_settings = get_smtp_settings(args.email_credentials)
-        send_via_smtp(smtp_settings, owner_settings['emails'], problems)
+        logger.info(f'Going to send the alert to {owner_name}')
+        send_alert(args, owner_settings['emails'], problems)
 
     print('Amount: ')
     print(amount_of_errors)

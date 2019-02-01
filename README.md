@@ -2,12 +2,6 @@
 
 [![Build Status](https://travis-ci.com/kewtree1408/emonalerts.svg?token=sN2juxZGRBsY3B6bKghG&branch=master)](https://travis-ci.com/kewtree1408/emonalerts)
 
-## Run via docker:
-```
-docker build . -t emonalerts
-docker run -d -v $PWD/success.toml:/app/success.toml -v $PWD/credentials.json:/app/credentials.json emonalerts
-```
-
 ## Example of config:
 ```toml
 # This is a TOML document.
@@ -40,7 +34,8 @@ minutes = 5
 
 ```
 
-## Example of credentials from email:
+## Example of email credentials:
+If you have an email from which are you going to send the information about services:
 ```json
 {
     "email": "easy.mon.alerts@gmail.com",
@@ -56,7 +51,8 @@ cd emonalerts/
 python3 -m venv .venv
 source edocmon/.venv/bin/activate
 pip install -r src/req.txt
-./src/runner.py success.toml credentials.json -v -a
+./src/runner.py success.toml -v -a
+./src/runner.py success.toml -e credentials.json -v -a
 ```
 
 ## How to run tests:
@@ -68,4 +64,23 @@ tox
 How to run one test:
 ```
 tox -- src/tests/test_utils.py::TestHostSettings::test_host_settings
+```
+
+## Run via docker:
+Check:
+```
+docker build . \
+    --build-arg TOML="/app/default.toml" \
+    --build-arg EMAIL=" -e /app/credentials.json" \
+    -t emonalerts
+
+docker run -d \
+    -v $PWD/default.toml:/app/example.toml \
+    -v $PWD/credentials.json:/app/credentials.json \
+    -v $PWD/checker.db:/app/emonalerts/db/checker.db \
+    emonalerts
+```
+
+```
+docker run -d -v $PWD/default.toml:/app/example.toml -v $PWD/credentials.json:/app/credentials.json emonalerts
 ```

@@ -17,3 +17,4 @@
 14. Send the table with statuses:
 this server - perfect
 that server - something bad happend
+15. Try to send mails via console
