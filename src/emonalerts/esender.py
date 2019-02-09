@@ -16,12 +16,13 @@ logger = logging.getLogger(__name__)
 
 def get_email_message(sender, recipient, problems):
     msg = EmailMessage()
-    msg['Subject'] = funny_emos.get_msg_subject()
     msg['From'] = sender
     msg['To'] = recipient
     if problems:
+        msg['Subject'] = funny_emos.get_msg_subject(with_problem=True)
         msg.set_content(funny_emos.get_msg_content(problems))
     else:
+        msg['Subject'] = funny_emos.get_msg_subject(with_problem=False)
         msg.set_content(funny_emos.get_msg_content_without_problems())
     return msg
 

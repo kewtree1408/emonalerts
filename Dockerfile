@@ -12,4 +12,4 @@ ARG EMAIL
 RUN echo ${TOML}
 RUN echo ${EMAIL}
 
-ENTRYPOINT ["./runner.py", ${TOML}, ${EMAIL}, "-a", "-v"]
+ENTRYPOINT ["./runner.py", ${TOML}, "-e", ${EMAIL}, "-a", "-v"]
