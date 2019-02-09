@@ -242,9 +242,10 @@ class TestCheck(unittest.TestCase):
             'host': 'smtp.gmail.com',
             'port': 465,
         }
-        with patch('emonalerts.schecker.send_via_smtp', return_value=None) as p2, \
-             patch('emonalerts.schecker.get_smtp_settings', return_value=email_credentials) as p1:
-            check(mock_args, settings)
+        with patch('emonalerts.schecker.send_via_smtp', return_value=None) as p1, \
+             patch('emonalerts.schecker.get_smtp_settings', return_value=email_credentials) as p2, \
+             patch('emonalerts.schecker.get_settings', return_value=settings) as p3:
+            check(mock_args)
 
         amount_of_errors, will_send_emails = dbc.get_alert_data(owner_name)
         self.assertEqual(amount_of_errors, 0)
@@ -290,8 +291,9 @@ class TestCheck(unittest.TestCase):
             'port': 465,
         }
         with patch('emonalerts.schecker.send_via_smtp', return_value=None) as p2, \
-             patch('emonalerts.schecker.get_smtp_settings', return_value=email_credentials) as p1:
-            check(mock_args, settings)
+             patch('emonalerts.schecker.get_smtp_settings', return_value=email_credentials) as p1, \
+             patch('emonalerts.schecker.get_settings', return_value=settings) as p3:
+            check(mock_args)
 
         amount_of_errors, will_send_emails = dbc.get_alert_data(owner_name)
         self.assertEqual(amount_of_errors, 3)
@@ -299,8 +301,9 @@ class TestCheck(unittest.TestCase):
         self.assertEqual(will_send_emails, True)
 
         with patch('emonalerts.schecker.send_via_smtp', return_value=None) as p2, \
-             patch('emonalerts.schecker.get_smtp_settings', return_value=email_credentials) as p1:
-            check(mock_args, settings)
+             patch('emonalerts.schecker.get_smtp_settings', return_value=email_credentials) as p1, \
+             patch('emonalerts.schecker.get_settings', return_value=settings) as p3:
+            check(mock_args)
 
         amount_of_errors, will_send_emails = dbc.get_alert_data(owner_name)
         self.assertEqual(amount_of_errors, 3)

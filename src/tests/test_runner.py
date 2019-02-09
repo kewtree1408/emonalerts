@@ -18,7 +18,7 @@ class TestRunner(unittest.TestCase):
         self.credential_path = str(self.cur_dir.joinpath('src/tests/input/creds.json'))
 
     def test_parsing_args(self):
-        args = self.parser.parse_args(['test', 'test2', '-a', '-v'])
+        args = self.parser.parse_args(['test', '-e', 'test2', '-a', '-v'])
         self.assertEqual(args.config, 'test')
         self.assertEqual(args.email_credentials, 'test2')
         self.assertEqual(args.alert, True)
@@ -26,14 +26,14 @@ class TestRunner(unittest.TestCase):
 
     @patch('runner.check')
     def test_keyboard_interrupt_exception(self, mock_check):
-        args = self.parser.parse_args([self.setting_path, self.credential_path, '-a', '-v'])
+        args = self.parser.parse_args([self.setting_path, '-e', self.credential_path, '-a', '-v'])
         mock_check.side_effect = KeyboardInterrupt('Stop!')
         infinitive_check(args)
         assert mock_check.called
 
     @patch('runner.check')
     def test_any_other_exception(self, mock_check):
-        args = self.parser.parse_args([self.setting_path, self.credential_path, '-a', '-v'])
+        args = self.parser.parse_args([self.setting_path, '-e', self.credential_path, '-a', '-v'])
         mock_check.side_effect = Exception('Boom!')
         infinitive_check(args)
         assert mock_check.called
