@@ -62,7 +62,7 @@ MIME-Version: 1.0
 </body>
 </html>
 """
-    subject = funny_emos.get_msg_subject()    #"You've recieved the alert from EasyMonAlerts"
+    subject = funny_emos.get_msg_subject()
     logger.info(to_emails)
     for to_email in to_emails:
         with open('/tmp/message.html', 'w') as femail:

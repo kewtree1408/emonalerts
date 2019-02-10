@@ -30,7 +30,7 @@ def get_msg_content_without_problems():
 
 
 def get_msg_subject(with_problem=False):
-    em = ':white_check_mark:'
+    em = u'✅ '
     if with_problem:
-        em = ':red_circle:'
-        return emoji.emojize(em + "Alert from EasyMonAlerts :seven_o’clock:")
+        em = ':red_circle: '
+    return emoji.emojize(em + "You've recieved the alert from EasyMonAlerts :seven_o’clock:")
