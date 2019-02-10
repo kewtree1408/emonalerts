@@ -5,68 +5,59 @@ Dbcmds - simple queries to sqlite3 database
 
 import logging
 from emonalerts.db.models import (
+    URLOwner,
     Alert,
-    Uptime,
+    History,
 )
+from datetime import datetime
 from pony.orm.core import *
 
 logger = logging.getLogger(__name__)
 
 
 @db_session
-def insert_uptime_table(url, successful, unsuccessful, amount_of_checks):
-    Uptime(
-        url=url,
-        successful=successful,
-        unsuccessful=unsuccessful,
-        amount_of_checks=amount_of_checks
-    )
+def insert_history_table(owner, url, status):
+    url_owner = URLOwner.get(owner=owner, url=url)
+    if not url_owner:
+        url_owner = URLOwner(url=url, owner=owner)
+    url_owner.history_records.create(status=status)
 
 
 @db_session
-def update_uptime_table(url, successful, unsuccessful, amount_of_checks):
-    uptime_data = Uptime.get(url=url)
-    if uptime_data is None:
-        insert_uptime_table(url, successful, unsuccessful, amount_of_checks)
+def upsert_history_table(owner, url, status):
+    url_owner = URLOwner.get(owner=owner, url=url)
+    if not url_owner:
+        url_owner = URLOwner(url=url, owner=owner)
+
+    h = History.get(url=url_owner)
+    if h:
+        h.status = status
+        h.timestamp = datetime.now()
+    else:
+        History(url=url_owner, status=status)
+
+
+@db_session
+def update_history_table(owner, url, status):
+    url_owner = URLOwner.get(owner=owner, url=url)
+    if not url_owner:
         return
 
-    uptime_data.successful = successful
-    uptime_data.unsuccessful = unsuccessful
-    uptime_data.amount_of_checks = amount_of_checks
+    h = History.get(url=url_owner)
+    if h:
+        h.status = status
+        h.timestamp = datetime.now()
 
 
 @db_session
-def get_uptime_data(url):
-    uptime_data = Uptime.get(url=url)
-    if uptime_data is None:
-        return (None, None, None)
-    return (uptime_data.successful, uptime_data.unsuccessful, uptime_data.amount_of_checks)
+def update_alert_table(owner, url, is_ok):
+    owner = URLOwner(url=url, owner=owner)
+    owner.alerts.create(is_ok=is_ok)
 
 
 @db_session
-def insert_alert_table(owner_name, error_amount, alert_needed):
-    Alert(owner_name=owner_name, error_amount=error_amount, alert_needed=alert_needed)
-
-
-@db_session
-def update_alert_table(owner_name, error_amount, alert_needed):
-    alert_data = Alert.get(owner_name=owner_name)
-    if alert_data is None:
-        insert_alert_table(owner_name, error_amount, alert_needed)
-        return
-
-    alert_data.error_amount = error_amount
-    alert_data.alert_needed = alert_needed
-
-
-@db_session
-def get_alert_data(owner_name):
-    alert_data = Alert.get(owner_name=owner_name)
-    if alert_data is None:
-        return (None, None)
-
-    return (alert_data.error_amount, alert_data.alert_needed)
-
-
-def is_alert_owner_empty(owner_name):
-    return get_alert_data(owner_name) is None
+def is_url_success(owner, url):
+    owner = URLOwner(url=url, owner=owner)
+    if not owner.alerts:
+        raise ValueError()
+    return owner.alerts[0].success

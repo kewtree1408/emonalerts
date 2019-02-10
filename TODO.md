@@ -12,11 +12,14 @@
 - [test badge]
 - [version python badge]
 - [docker hub]
-12. Do not store password in credentials
+
+12. Do not store password in credentials (hash)
 13. Change the mails with html, simplify the report
 14. Try to send mails via console
-15. Send emails per server with every changes
+
+15. Send emails per server with every changes - change the structure of DB
 16. Store timestamp for each URL
 17. Send uptime information
 18. Simplify work with docker console
-19. Add flask admin for users
+19. Add classes: Check / Notification
+19. Add flask admin for users (PonyORM supports flask-admin)
