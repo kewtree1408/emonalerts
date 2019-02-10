@@ -6,12 +6,10 @@ title = "TOML Example for EasyMonAlerts"
 name = "Victoria Fantasy"
 emails = [
     "me@vika.space",
-    "vi@umc8.ru"
 ]
 
 [period]
-minutes = 5
-
+minutes = 1
 
 # Urls for ping
 
@@ -24,11 +22,6 @@ minutes = 5
     ]
     host = "localhost"
     ports = [ 8080, 8001, 8002 ]
-
-    [servers.friendly_name2]
-    schemes = ["http"]
-    host = "localhost"
-    ports = [ 8080, 80, 81 ]
 
     [servers.friendly_name4]
     schemes = ["https"]

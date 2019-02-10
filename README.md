@@ -69,18 +69,21 @@ tox -- src/tests/test_utils.py::TestHostSettings::test_host_settings
 ## Run via docker:
 Check:
 ```
-docker build . \
-    --build-arg TOML="/app/default.toml" \
-    --build-arg EMAIL=" -e /app/credentials.json" \
-    -t emonalerts
+docker build . -t emonalerts
+```
 
+```
+touch checker.db
 docker run -d \
-    -v $PWD/default.toml:/app/example.toml \
+    -v $PWD/problems.toml:/app/example.toml \
     -v $PWD/credentials.json:/app/credentials.json \
     -v $PWD/checker.db:/app/emonalerts/db/checker.db \
-    emonalerts
+    emonalerts /app/runner.py /app/example.toml -e /app/credentials.json -a -v
 ```
 
 ```
-docker run -d -v $PWD/default.toml:/app/example.toml -v $PWD/credentials.json:/app/credentials.json emonalerts
+docker run -d \
+    -v $PWD/success.toml:/app/example.toml \
+    -v $PWD/checker.db:/app/emonalerts/db/checker.db \
+    emonalerts /app/runner.py /app/example.toml -a -v
 ```

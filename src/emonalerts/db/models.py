@@ -24,5 +24,5 @@ class Alert(db.Entity):
     alert_needed = Required(bool)
 
 
-set_sql_debug(True)
+# set_sql_debug(True)
 db.generate_mapping(create_tables=True)

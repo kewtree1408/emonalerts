@@ -4,12 +4,4 @@ LABEL name="Victoria"
 LABEL email="me@vika.space"
 
 COPY ./src/ /app
-WORKDIR /app
-RUN pip install -r req.txt && chmod +x runner.py
-ARG TOML
-ARG EMAIL
-
-RUN echo ${TOML}
-RUN echo ${EMAIL}
-
-ENTRYPOINT ["./runner.py", ${TOML}, "-e", ${EMAIL}, "-a", "-v"]
+RUN pip install -r /app/req.txt && chmod +x /app/runner.py
